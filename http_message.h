@@ -24,4 +24,11 @@ void read_http_client_message(int client_sock,
 
 void http_client_message_free(http_client_message_t* msg);
 
+int respond_to_static(int sock_fd, http_client_message_t* http_msg, char* path);
+
+int respond_to_calc(int sock_fd, http_client_message_t* http_msg, char* path);
+
+int respond_to_stats(int sock_fd, http_client_message_t* http_msg, char* path);
+
+
 #endif

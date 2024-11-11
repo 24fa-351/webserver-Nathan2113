@@ -6,15 +6,28 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #include "http_message.h"
 
 #define DEFAULT_PORT 80
 #define LISTEN_BACKLOG 5
 
 int respond_to_http_client_message(int sock_fd, http_client_message_t* http_msg) {
-    char* response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-    write(sock_fd, response, strlen(response));
-    return 0;
+
+    char* method = http_msg->method;
+    char* path = http_msg->path;
+    printf("HTTP Method: %s\n", method);
+    printf("HTTP Path: %s\n", path);
+
+    if (strncmp(path, "/static/images/", 15) == 0)
+        respond_to_static(sock_fd, http_msg, path);
+    else if(strncmp(path, "/calc", 5) == 0) 
+        respond_to_calc(sock_fd, http_msg, path);
+    else if(strncmp(path, "/stats", 6) == 0)
+        respond_to_stats(sock_fd, http_msg, path);
+
+    return -1;
 }
 
 // input pointer is freed by this function
@@ -29,6 +42,7 @@ void handleConnection(int* sock_fd_ptr) {
         http_read_result_t result;
 
         read_http_client_message(sock_fd, &http_msg, &result);
+
         if (result == BAD_REQUEST) {
             printf("Bad request\n");
             close(sock_fd);
@@ -43,7 +57,7 @@ void handleConnection(int* sock_fd_ptr) {
         http_client_message_free(http_msg);
     }
 
-    printf("done with connection %d\n", sock_fd);
+    printf("Done with connection %d\n", sock_fd);
 }
 
 
@@ -97,15 +111,9 @@ int main(int argc, char* argv[]) {
             socket_fd, (struct sockaddr*)&client_address,
             &client_address_len);
 
-        printf("accepted connection on %d\n",
-        *client_fd_buf);
+        printf("accepted connection on %d\n", *client_fd_buf);
 
-        pthread_create(&thread, NULL, (void* (*)
-        (void*))handleConnection,
-            (void*)client_fd_buf);
+        pthread_create(&thread, NULL, (void* (*)(void*))handleConnection, (void*)client_fd_buf);
     }
 
-    close(socket_fd);
-
-    return 0;
 }
