@@ -105,5 +105,7 @@ int main(int argc, char* argv[]) {
             (void*)client_fd_buf);
     }
 
+    close(socket_fd);
+
     return 0;
 }
