@@ -13,7 +13,7 @@ SRCS = main.c http_message.c
 OBJS = $(SRCS:.c=.o)
 
 # Executable name
-TARGET = redir
+TARGET = webserver
 
 # Default target
 all: $(TARGET)
