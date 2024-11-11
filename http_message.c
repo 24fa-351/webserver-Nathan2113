@@ -14,7 +14,7 @@ int total_sent_bytes = 0;
 pthread_mutex_t stats_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 bool is_complete_http_message(char* buffer) {
-    printf("Buffer receieved: '%s'\n", buffer);
+    // printf("Buffer receieved: '%s'\n", buffer);
 
     if(strlen(buffer) < 4) {
         return false;
@@ -44,8 +44,8 @@ void read_http_client_message(int client_sock,
             total_received_bytes += bytes_read;
             pthread_mutex_unlock(&stats_mutex);
 
-            printf("Bytes read: %d\n", bytes_read);
-            printf("Buffer content: '%s'\n", buffer);
+            // printf("Bytes read: %d\n", bytes_read);
+            // printf("Buffer content: '%s'\n", buffer);
             if(bytes_read == 0) {
                 *result = CLOSED_CONNECTION;
                 return;
@@ -75,7 +75,7 @@ int respond_to_static(int sock_fd, http_client_message_t* http_msg, char* path) 
         char *image_name = path + 15;
         char file_path[256];
         snprintf(file_path, sizeof(file_path), "static/images/%s", image_name);
-        printf("Image file path: %s\n", file_path);
+        // printf("Image file path: %s\n", file_path);
 
         int img_fd = open(file_path, O_RDONLY);
         if (img_fd < 0) {
