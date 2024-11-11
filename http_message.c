@@ -44,8 +44,8 @@ void read_http_client_message(int client_sock,
             total_received_bytes += bytes_read;
             pthread_mutex_unlock(&stats_mutex);
 
-            // printf("Bytes read: %d\n", bytes_read);
-            // printf("Buffer content: '%s'\n", buffer);
+            printf("Bytes read: %d\n", bytes_read);
+            printf("Buffer content: '%s'\n", buffer);
             if(bytes_read == 0) {
                 *result = CLOSED_CONNECTION;
                 return;
