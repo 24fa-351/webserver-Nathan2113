@@ -1,6 +1,13 @@
 #ifndef HTTP_MESSAGE_H
 #define HTTP_MESSAGE_H
 
+#include <pthread.h>
+
+extern int total_requests;
+extern int total_received_bytes;
+extern int total_sent_bytes;
+extern pthread_mutex_t stats_mutex;
+
 typedef struct msg {
     char* method;
     char* path;

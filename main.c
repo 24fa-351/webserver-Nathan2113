@@ -13,7 +13,10 @@
 #define DEFAULT_PORT 80
 #define LISTEN_BACKLOG 5
 
+
 int respond_to_http_client_message(int sock_fd, http_client_message_t* http_msg) {
+
+    int bytes_sent = 0;
 
     char* method = http_msg->method;
     char* path = http_msg->path;
@@ -21,11 +24,16 @@ int respond_to_http_client_message(int sock_fd, http_client_message_t* http_msg)
     printf("HTTP Path: %s\n", path);
 
     if (strncmp(path, "/static/images/", 15) == 0)
-        respond_to_static(sock_fd, http_msg, path);
+        bytes_sent = respond_to_static(sock_fd, http_msg, path);
     else if(strncmp(path, "/calc", 5) == 0) 
-        respond_to_calc(sock_fd, http_msg, path);
+        bytes_sent = respond_to_calc(sock_fd, http_msg, path);
     else if(strncmp(path, "/stats", 6) == 0)
-        respond_to_stats(sock_fd, http_msg, path);
+        bytes_sent = respond_to_stats(sock_fd, http_msg, path);
+
+
+    pthread_mutex_lock(&stats_mutex);
+    total_sent_bytes += bytes_sent;
+    pthread_mutex_unlock(&stats_mutex);
 
     return -1;
 }
@@ -70,13 +78,6 @@ int main(int argc, char* argv[]) {
     socket_address.sin_family = AF_INET;
     socket_address.sin_addr.s_addr = htonl(INADDR_ANY);
     
-
-    // if(strcmp(argv[1], "-p") == 0) {
-    //     port = atoi(argv[2]);
-    //     socket_address.sin_port = htons(port);
-    // } else {
-    //     socket_address.sin_port = htons(DEFAULT_PORT);
-    // }
 
     if(argc > 1) {
         if(strcmp(argv[1], "-p") == 0) {
